@@ -80,6 +80,7 @@ void initScene(int argc, char *argv[]){
     }
     if(strcmp(argv[i], "-sp") == 0) {
       float rv= strtof(argv[i+1], NULL);
+      glMaterialf(GL_FRONT, GL_SHININESS, rv);
       i += 1;
     }
     if(strcmp(argv[i], "-pl") == 0) {
