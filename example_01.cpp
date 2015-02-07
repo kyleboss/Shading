@@ -223,6 +223,15 @@ void myDisplay() {
 }
 
 
+void handle(unsigned char key, int x, int y) {
+  switch (key) {
+    case 32: //space
+      exit(0);
+      break;
+  }
+  glutPostRedisplay();
+}
+
 
 //****************************************************
 // the usual stuff, nothing exciting here
@@ -245,7 +254,7 @@ int main(int argc, char *argv[]) {
   initScene(argc, argv);							// quick function to set up scene
   glutDisplayFunc(myDisplay);				// function to run when its time to draw something
   glutReshapeFunc(myReshape);				// function to run when the window gets resized
-
+  glutKeyboardFunc(handle); //exit on space
   glutMainLoop();							// infinite loop that will keep drawing and resizing
   // and whatever else
 
