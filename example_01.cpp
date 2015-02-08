@@ -75,6 +75,15 @@ Vec mul(Vec vec1, Vec vec2) {
   return mulVec;
 }
 
+Vec sub(Vec vec1, Vec vec2) {
+  Vec subVec;
+  float val1 = vec1.val1*vec2.val1;
+  float val2 = vec1.val2*vec2.val2;
+  float val3 = vec1.val3*vec2.val3;
+  subVec.Set(val1, val2, val3);
+  return subVec;
+}
+
 typedef struct {
   Vec color;
   Vec pos;
