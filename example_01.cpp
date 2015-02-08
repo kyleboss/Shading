@@ -50,17 +50,13 @@ typedef struct {
   float val3;
   void Set(float v1, float v2, float v3){val1=v1, val2=v2, val3=v3;}
   float length(){return sqrt(pow(val1,2)+pow(val2,2)+pow(val3,2));}
+  void normalize(){
+    float length = this->length();
+    this->val1 = this->val1/length;
+    this->val2 = this->val2/length;
+    this->val3 = this->val3/length;
+  }
 } Vec;
-
-Vec normalize(Vec vec) {
-  float length = vec.length();
-  float val1 = vec.val1/length;
-  float val2 = vec.val2/length;
-  float val3 = vec.val3/length;
-  Vec normalized;
-  normalized.Set(val1, val2, val3);
-  return normalized;
-}
 
 float dotProduct(Vec vec1, Vec vec2) {
   return vec1.val1*vec2.val1 + vec1.val2*vec2.val2 + vec1.val3*vec2.val3;
@@ -73,6 +69,15 @@ Vec mul(Vec vec1, Vec vec2) {
   float val3 = vec1.val3*vec2.val3;
   mulVec.Set(val1, val2, val3);
   return mulVec;
+}
+
+Vec sub(Vec vec1, Vec vec2) {
+  Vec subVec;
+  float val1 = vec1.val1-vec2.val1;
+  float val2 = vec1.val2-vec2.val2;
+  float val3 = vec1.val3-vec2.val3;
+  subVec.Set(val1, val2, val3);
+  return subVec;
 }
 
 typedef struct {
@@ -96,8 +101,6 @@ Light pl[] = {pl0, pl1, pl2, pl3, pl4};
 void initScene(int argc, char *argv[]){
   GLint iLights;
   glGetIntegerv(GL_MAX_LIGHTS, &iLights);
-  // std::cout << "Lights: " << iLights;
-  // int lights[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7, GL_LIGHT8, GL_LIGHT9}
   for (int i = 1; i < argc; ++i) {
     std::cout << argv[i] << std::endl;
     if(strcmp(argv[i], "-ka") == 0) {
@@ -164,25 +167,6 @@ void initScene(int argc, char *argv[]){
       i += 6;
     }
   }
-
-  // Nothing to do here for this simple example.
-// Somewhere in the initialization part of your program…
-glEnable(GL_LIGHTING);
-GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
-// glLightfv(GL_LIGHT0, GL_POSITION, position);
-glEnable(GL_LIGHT0);
- 
-// Create light components
-GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-// GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
- 
-// Assign created components to GL_LIGHT0
-glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-// glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
 
