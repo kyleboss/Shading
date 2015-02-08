@@ -52,9 +52,10 @@ typedef struct {
   float dotProduct(Color color2){return r*color2.r + g*color2.g + b*color2.b;}
   Color normify() {
     Color newColor;
-    newR = r / sqrt(r) + sqrt(g) + sqrt(b);
-    newG = g / sqrt(r) + sqrt(g) + sqrt(b);
-    newB = b / sqrt(r) + sqrt(g) + sqrt(b);
+    float norm = sqrt(r*r + g*g + b*b);
+    float newR = r / norm;
+    float newG = g / norm;
+    float newB = b / norm;
     newColor.Set(newR, newG, newB);
     return newColor;
   }
@@ -68,9 +69,10 @@ typedef struct {
   float dotProduct(Pos pos2){return x*pos2.x + y*pos2.y + z*pos2.z;}
   Pos normify() {
     Pos newPos;
-    newX = x / sqrt(x) + sqrt(y) + sqrt(z);
-    newY = y / sqrt(x) + sqrt(y) + sqrt(z);
-    newZ = z / sqrt(x) + sqrt(y) + sqrt(z);
+    float norm = sqrt(x*x + y*y + z*z);
+    float newX = x / norm;
+    float newY = y / norm;
+    float newZ = z / norm;
     newPos.Set(newX, newY, newZ);
     return newPos;
   }
@@ -89,6 +91,12 @@ int numDl = 0;
 int numPl = 0;
 Light dl[] = {Light dl0, Light dl1, Light dl2, Light dl3, Light dl4};
 Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};
+
+int numDl = 0;
+int numPl = 0;
+int totalLights = 0;
+int dl[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3};
+int pl[] = {GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
 
 //****************************************************
 // Simple init function
