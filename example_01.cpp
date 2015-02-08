@@ -94,6 +94,8 @@ typedef struct {
 Vec ka;
 Vec kd;
 Vec ks;
+Vec v;
+v.Set(0, 0, 1);
 int numDl = 0;
 int numPl = 0;
 Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
@@ -250,24 +252,27 @@ void circle(float centerX, float centerY, float radius) {
 
         float ln = dotProduct(dl[k].pos.normalize(), norm);
         
-        diffpos = max(0, ln); //max(l.n, 0)
+        float diffPos = max(0, ln); //max(l.n, 0)
         
         Vec r;
         r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
         r.Scale(2 * ln)
         r = sub(r, dl[k].pos.normalize()); //r is correct
+        r.normalize();
 
+        float specPos = pow(max(0, dotProduct(r, v)), rv);
 
         for (k=0; k < numDl; k++) { //loop direction light
-          Vec ambient; // ambient = ka*I, color
+          //dl[k].color = I
+          Vec ambient; // ambient = ka*I; color
           ambient.Set(mul(ka, dl[k].color));
 
-          Vec diffuse; //diffuse = kd * I * max(l.n, 0), color
-          diffuse.set(mul(kd, dl[k].color));
+          Vec diffuse; //diffuse = kd * I * max(l.n, 0); color
+          diffuse.Set(mul(kd, dl[k].color).scale(diffPos));
 
+          Vec specular; //diffuse = ks * I * max(r.v, 0); color
+          specular.Set(mul(ks, dl[k].color).scale(specPos));
 
-           //DEFINE  
-            total += ka*i + 
         }
 
 
