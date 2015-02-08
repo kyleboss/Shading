@@ -261,8 +261,19 @@ void circle(float centerX, float centerY, float radius) {
 
         // This is the front-facing Z coordinate
         float z = sqrt(radius*radius-dist*dist);
+        Vec total;
+        total.Set()
+        for (k=0; k < 5; k++) { //DL loop, TO REPLACE 5 w actual length?
+        Vec norm;
+        norm.Set(i, j, z);
+         //DEFINE  
+        dotProduct(dl0.pos, norm)
+          total += ka*i + 
+        }
+        Vec ambient;
+        ambient.Set(mul(Ka, dl0.color));
 
-        setPixel(i,j, 1.0, 0.0, 0.0);
+        setPixel(i, j, total.r, total.g, total.b);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
         // setPixel(i,j, x/radius, y/radius, z/radius );
