@@ -43,7 +43,7 @@ class Viewport {
 // Global Variables
 //****************************************************
 Viewport  viewport;
-/*
+
 typedef struct {
   float r;
   float g;
@@ -52,10 +52,9 @@ typedef struct {
   float dotProduct(Color color2){return r*color2.r + g*color2.g + b*color2.b;}
   Color normify() {
     Color newColor;
-    float norm = sqrt(r*r + g*g + b*b);
-    float newR = r / norm;
-    float newG = g / norm;
-    float newB = b / norm;
+    newR = r / sqrt(r) + sqrt(g) + sqrt(b);
+    newG = g / sqrt(r) + sqrt(g) + sqrt(b);
+    newB = b / sqrt(r) + sqrt(g) + sqrt(b);
     newColor.Set(newR, newG, newB);
     return newColor;
   }
@@ -69,10 +68,9 @@ typedef struct {
   float dotProduct(Pos pos2){return x*pos2.x + y*pos2.y + z*pos2.z;}
   Pos normify() {
     Pos newPos;
-    float norm = sqrt(x*x + y*y + z*z);
-    float newX = x / norm;
-    float newY = y / norm;
-    float newZ = z / norm;
+    newX = x / sqrt(x) + sqrt(y) + sqrt(z);
+    newY = y / sqrt(x) + sqrt(y) + sqrt(z);
+    newZ = z / sqrt(x) + sqrt(y) + sqrt(z);
     newPos.Set(newX, newY, newZ);
     return newPos;
   }
@@ -90,69 +88,49 @@ Color ks;
 int numDl = 0;
 int numPl = 0;
 Light dl[] = {Light dl0, Light dl1, Light dl2, Light dl3, Light dl4};
-Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};*/
-
-int numDl = 0;
-int numPl = 0;
-int totalLights = 0;
-int dl[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3};
-int pl[] = {GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
-
-float getLength(float v[]) {
-  float x = v[0];
-  float y = v[1];
-  float z = v[2];
-  return sqrt(pow(x,2)+pow(y,2)+pow(z,2));
-}
-
-// float *getNorm(float v[]) {
-//   float x = v[0];
-//   float y = v[1];
-//   float z = v[2];
-//   float length = getLength(v);
-//   float normX = x / length;
-//   float normY = y / length;
-//   float normZ = z / length;
-//   float toRet[] = {normX, normY, normZ};
-//   return toRet;
-// }
+Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};
 
 //****************************************************
 // Simple init function
 //****************************************************
 void initScene(int argc, char *argv[]){
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_NORMALIZE);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_RESCALE_NORMAL);
+  GLint iLights;
+  glGetIntegerv(GL_MAX_LIGHTS, &iLights);
+  // std::cout << "Lights: " << iLights;
+  // int lights[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7, GL_LIGHT8, GL_LIGHT9}
   for (int i = 1; i < argc; ++i) {
+    std::cout << argv[i] << std::endl;
     if(strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      ka.Set(r,g,b);
       GLfloat ambient[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+      glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+      std::cout << ka.r << std::endl;
       i += 3;
     }
     if(strcmp(argv[i], "-kd") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      kd.Set(r,g,b);
       GLfloat diffuse[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
       i += 3;
-    } 
+    }
     if(strcmp(argv[i], "-ks") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      ks.Set(r,g,b);
       GLfloat specular[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+      glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
       i += 3;
     }
     if(strcmp(argv[i], "-sp") == 0) {
       float rv= strtof(argv[i+1], NULL);
-      glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, rv);
+      glMaterialf(GL_FRONT, GL_SHININESS, rv);
       i += 1;
     }
     if(strcmp(argv[i], "-pl") == 0) {
@@ -162,15 +140,11 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
-      float lightColors[] = {r,g,b,1};
-      float lightPos[] = {x,y,z,1};
-      int currLight = GL_LIGHT0+totalLights;
-      glEnable(currLight);
-      glLightfv(currLight, GL_AMBIENT, lightColors);
-      glLightfv(currLight, GL_DIFFUSE, lightColors);
-      glLightfv(currLight, GL_SPECULAR, lightColors);
-      glLightfv(currLight, GL_POSITION, lightPos);
-      totalLights += 1;
+      Color lightColor;
+      Pos lightPos;
+      lightColor.Set(r,g,b);
+      lightPos.Set(x,y,z);
+      pl[numPl].Set(lightColor, lightPos);
       numPl += 1;
       i += 6;
     }
@@ -182,23 +156,35 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
-
-      float lightColors[] = {r,g,b,1};
-      // int currLight = pl[numDl];
-      float lightPos[] = {x,y,z,0};
-      int currLight = GL_LIGHT0+totalLights;
-      glEnable(currLight);
-      glLightfv(currLight, GL_AMBIENT, lightColors);
-      glLightfv(currLight, GL_DIFFUSE, lightColors);
-      glLightfv(currLight, GL_SPECULAR, lightColors);
-      glLightfv(currLight, GL_POSITION, lightPos);
-      totalLights += 1;
-      // numDl += 1;
+      Color lightColor;
+      Pos lightPos;
+      lightColor.Set(r,g,b);
+      lightPos.Set(x,y,z);
+      dl[numDl].Set(lightColor, lightPos);
+      numdl += 1;
       i += 6;
     }
   }
-}
 
+  // Nothing to do here for this simple example.
+// Somewhere in the initialization part of your program…
+glEnable(GL_LIGHTING);
+GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
+// glLightfv(GL_LIGHT0, GL_POSITION, position);
+glEnable(GL_LIGHT0);
+ 
+// Create light components
+GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+// GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
+ 
+// Assign created components to GL_LIGHT0
+glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+// glLightfv(GL_LIGHT0, GL_POSITION, position);
+}
 
 
 //****************************************************
@@ -222,9 +208,8 @@ void myReshape(int w, int h) {
 // this example.
 //****************************************************
 
-void setPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b) {
+void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
   glColor3f(r, g, b);
-  glNormal3f(0, 0, z);
   glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
   // centers 
   // Note: Need to check for gap
@@ -269,7 +254,7 @@ void circle(float centerX, float centerY, float radius) {
         // This is the front-facing Z coordinate
         float z = sqrt(radius*radius-dist*dist);
 
-        setPixel(i, j, z, 0.0, 0.0, 0.0);
+        setPixel(i,j, 1.0, 0.0, 0.0);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
         // setPixel(i,j, x/radius, y/radius, z/radius );
@@ -294,7 +279,7 @@ void myDisplay() {
 
   // Start drawing
 
-  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) * 0.45);
+  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) / 3.0);
 
   glFlush();
   glutSwapBuffers();          // swap buffers (we earlier set double buffer)
