@@ -141,7 +141,7 @@ void initScene(int argc, char *argv[]){
       GLfloat diffuse[] = {r,g,b,1};
       glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
       i += 3;
-    }
+    } 
     if(strcmp(argv[i], "-ks") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
