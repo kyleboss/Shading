@@ -76,11 +76,11 @@ Vec mul(Vec vec1, Vec vec2) {
   return mulVec;
 }
 
-Vec add(Vec vec1, Vec vec2) {
+Vec add(Vec vec1, Vec vec2, Vec vec3) {
   Vec addVec;
-  float val1 = vec1.val1+vec2.val1;
-  float val2 = vec1.val2+vec2.val2;
-  float val3 = vec1.val3+vec2.val3;
+  float val1 = vec1.val1+vec2.val1+vec3.val1;
+  float val2 = vec1.val2+vec2.val2+vec3.val2;
+  float val3 = vec1.val3+vec2.val3+vec3.val3;
   addVec.Set(val1, val2, val3);
   return addVec;
 }
