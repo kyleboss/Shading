@@ -46,6 +46,7 @@ Viewport	viewport;
 
 int numDl = 0;
 int numPl = 0;
+int totalLights = 0;
 int dl[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3};
 int pl[] = {GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
 
@@ -53,11 +54,11 @@ int pl[] = {GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
 // Simple init function
 //****************************************************
 void initScene(int argc, char *argv[]){
+
+
   glEnable(GL_LIGHTING);
   glEnable(GL_RESCALE_NORMAL);
-  // std::cout << "Lights: " << iLights;
   for (int i = 1; i < argc; ++i) {
-    std::cout << argv[i] << std::endl;
     if(strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
@@ -96,12 +97,14 @@ void initScene(int argc, char *argv[]){
       float b = strtof(argv[i+6], NULL);
       float lightColors[] = {r,g,b,1};
       float lightPos[] = {x,y,z,1};
-      int currLight = pl[numPl];
+      // int currLight = pl[numPl];
+      int currLight = GL_LIGHT0+totalLights;
       glEnable(currLight);
       glLightfv(currLight, GL_AMBIENT, lightColors);
       glLightfv(currLight, GL_DIFFUSE, lightColors);
       glLightfv(currLight, GL_SPECULAR, lightColors);
       glLightfv(currLight, GL_POSITION, lightPos);
+      totalLights += 1;
       numPl += 1;
       i += 6;
     }
@@ -115,36 +118,19 @@ void initScene(int argc, char *argv[]){
       float b = strtof(argv[i+6], NULL);
 
       float lightColors[] = {r,g,b,1};
-      int currLight = pl[numDl];
+      // int currLight = pl[numDl];
       float lightPos[] = {x,y,z,0};
+      int currLight = GL_LIGHT0+totalLights;
       glEnable(currLight);
       glLightfv(currLight, GL_AMBIENT, lightColors);
       glLightfv(currLight, GL_DIFFUSE, lightColors);
       glLightfv(currLight, GL_SPECULAR, lightColors);
       glLightfv(currLight, GL_POSITION, lightPos);
+      totalLights += 1;
       numDl += 1;
       i += 6;
     }
   }
-
-  // Nothing to do here for this simple example.
-// Somewhere in the initialization part of your program…
-glEnable(GL_LIGHTING);
-GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
-// glLightfv(GL_LIGHT0, GL_POSITION, position);
-glEnable(GL_LIGHT0);
- 
-// Create light components
-GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-// GLfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
- 
-// Assign created components to GL_LIGHT0
-glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-// glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
 
