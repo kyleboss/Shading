@@ -243,7 +243,14 @@ void circle(float centerX, float centerY, float radius) {
         norm.Set(i, j, z);
         norm.normalize();
 
-        dotProduct(dl[k].pos, norm)
+        float ln = dotProduct(dl[k].pos.normalize(), norm);
+        
+        diffpos = max(0, ln); //max(l.n, 0)
+        
+        Vec r;
+        r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
+        r.Scale(2 * ln)
+        r = sub(r, dl[k].pos.normalize()); //r is correct
 
 
         for (k=0; k < numDl; k++) { //loop direction light
