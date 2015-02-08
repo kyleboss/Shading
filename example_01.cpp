@@ -44,28 +44,77 @@ class Viewport {
 //****************************************************
 Viewport	viewport;
 
+typedef struct {
+  float r;
+  float g;
+  float b;
+  void Set(float R, float G, float B){r=R, g=G, b=B;}
+  float dotProduct(Color color2){return r*color2.r + g*color2.g + b*color2.b;}
+  Color normify() {
+    Color newColor;
+    newR = r / sqrt(r) + sqrt(g) + sqrt(b);
+    newG = g / sqrt(r) + sqrt(g) + sqrt(b);
+    newB = b / sqrt(r) + sqrt(g) + sqrt(b);
+    newColor.Set(newR, newG, newB);
+    return newColor;
+  }
+} Color;
 
+typedef struct {
+  float x;
+  float y;
+  float z;
+  void Set(float X, float Y, float Z){x=X, y=Y, z=Z;}
+  float dotProduct(Pos pos2){return x*pos2.x + y*pos2.y + z*pos2.z;}
+  Pos normify() {
+    Pos newPos;
+    newX = x / sqrt(x) + sqrt(y) + sqrt(z);
+    newY = y / sqrt(x) + sqrt(y) + sqrt(z);
+    newZ = z / sqrt(x) + sqrt(y) + sqrt(z);
+    newPos.Set(newX, newY, newZ);
+    return newPos;
+  }
+} Pos;
 
+typedef struct {
+  Color color;
+  Pos pos;
+  void Set(Color setColor, Pos setPos){color=setColor, pos=setPos;}
+} Light;
+
+Color ka;
+Color kd;
+Color ks;
+int numDl = 0;
+int numPl = 0;
+Light dl[] = {Light dl0, Light dl1, Light dl2, Light dl3, Light dl4};
+Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};
 
 //****************************************************
 // Simple init function
 //****************************************************
 void initScene(int argc, char *argv[]){
-
+  GLint iLights;
+  glGetIntegerv(GL_MAX_LIGHTS, &iLights);
+  // std::cout << "Lights: " << iLights;
+  // int lights[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7, GL_LIGHT8, GL_LIGHT9}
   for (int i = 1; i < argc; ++i) {
     std::cout << argv[i] << std::endl;
     if(strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      ka.Set(r,g,b);
       GLfloat ambient[] = {r,g,b,1};
       glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+      std::cout << ka.r << std::endl;
       i += 3;
     }
     if(strcmp(argv[i], "-kd") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      kd.Set(r,g,b);
       GLfloat diffuse[] = {r,g,b,1};
       glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
       i += 3;
@@ -74,6 +123,7 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
+      ks.Set(r,g,b);
       GLfloat specular[] = {r,g,b,1};
       glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
       i += 3;
@@ -90,15 +140,28 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
+      Color lightColor;
+      Pos lightPos;
+      lightColor.Set(r,g,b);
+      lightPos.Set(x,y,z);
+      pl[numPl].Set(lightColor, lightPos);
+      numPl += 1;
       i += 6;
     }
     if(strcmp(argv[i], "-dl") == 0) {
+      std::cout << typeid(GL_LIGHT0).name() << '\n';
       float x = strtof(argv[i+1], NULL);
       float y = strtof(argv[i+2], NULL);
       float z = strtof(argv[i+3], NULL);
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
+      Color lightColor;
+      Pos lightPos;
+      lightColor.Set(r,g,b);
+      lightPos.Set(x,y,z);
+      dl[numDl].Set(lightColor, lightPos);
+      numdl += 1;
       i += 6;
     }
   }
