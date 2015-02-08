@@ -42,7 +42,55 @@ class Viewport {
 //****************************************************
 // Global Variables
 //****************************************************
-Viewport	viewport;
+Viewport  viewport;
+/*
+typedef struct {
+  float r;
+  float g;
+  float b;
+  void Set(float R, float G, float B){r=R, g=G, b=B;}
+  float dotProduct(Color color2){return r*color2.r + g*color2.g + b*color2.b;}
+  Color normify() {
+    Color newColor;
+    float norm = sqrt(r*r + g*g + b*b);
+    float newR = r / norm;
+    float newG = g / norm;
+    float newB = b / norm;
+    newColor.Set(newR, newG, newB);
+    return newColor;
+  }
+} Color;
+
+typedef struct {
+  float x;
+  float y;
+  float z;
+  void Set(float X, float Y, float Z){x=X, y=Y, z=Z;}
+  float dotProduct(Pos pos2){return x*pos2.x + y*pos2.y + z*pos2.z;}
+  Pos normify() {
+    Pos newPos;
+    float norm = sqrt(x*x + y*y + z*z);
+    float newX = x / norm;
+    float newY = y / norm;
+    float newZ = z / norm;
+    newPos.Set(newX, newY, newZ);
+    return newPos;
+  }
+} Pos;
+
+typedef struct {
+  Color color;
+  Pos pos;
+  void Set(Color setColor, Pos setPos){color=setColor, pos=setPos;}
+} Light;
+
+Color ka;
+Color kd;
+Color ks;
+int numDl = 0;
+int numPl = 0;
+Light dl[] = {Light dl0, Light dl1, Light dl2, Light dl3, Light dl4};
+Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};*/
 
 int numDl = 0;
 int numPl = 0;
@@ -152,6 +200,7 @@ void initScene(int argc, char *argv[]){
 }
 
 
+
 //****************************************************
 // reshape viewport if the window is resized
 //****************************************************
@@ -173,8 +222,9 @@ void myReshape(int w, int h) {
 // this example.
 //****************************************************
 
-void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
+void setPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b) {
   glColor3f(r, g, b);
+  glNormal3f(0, 0, z);
   glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
   // centers 
   // Note: Need to check for gap
@@ -219,7 +269,7 @@ void circle(float centerX, float centerY, float radius) {
         // This is the front-facing Z coordinate
         float z = sqrt(radius*radius-dist*dist);
 
-        setPixel(i,j, 1.0, 0.0, 0.0);
+        setPixel(i, j, z, 1.0, 0.0, 0.0);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
         // setPixel(i,j, x/radius, y/radius, z/radius );
@@ -236,18 +286,18 @@ void circle(float centerX, float centerY, float radius) {
 // function that does the actual drawing of stuff
 //***************************************************
 void myDisplay() {
-  glClear(GL_COLOR_BUFFER_BIT);				// clear the color buffer
+  glClear(GL_COLOR_BUFFER_BIT);       // clear the color buffer
 
-  glMatrixMode(GL_MODELVIEW);			        // indicate we are specifying camera transformations
-  glLoadIdentity();				        // make sure transformation is "zero'd"
+  glMatrixMode(GL_MODELVIEW);             // indicate we are specifying camera transformations
+  glLoadIdentity();               // make sure transformation is "zero'd"
 
 
   // Start drawing
 
-  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) / 3.0);
+  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) * 0.45);
 
   glFlush();
-  glutSwapBuffers();					// swap buffers (we earlier set double buffer)
+  glutSwapBuffers();          // swap buffers (we earlier set double buffer)
 }
 
 
@@ -279,11 +329,11 @@ int main(int argc, char *argv[]) {
   glutInitWindowPosition(0,0);
   glutCreateWindow(argv[0]);
 
-  initScene(argc, argv);							// quick function to set up scene
-  glutDisplayFunc(myDisplay);				// function to run when its time to draw something
-  glutReshapeFunc(myReshape);				// function to run when the window gets resized
+  initScene(argc, argv);              // quick function to set up scene
+  glutDisplayFunc(myDisplay);       // function to run when its time to draw something
+  glutReshapeFunc(myReshape);       // function to run when the window gets resized
   glutKeyboardFunc(handle); //exit on space
-  glutMainLoop();							// infinite loop that will keep drawing and resizing
+  glutMainLoop();             // infinite loop that will keep drawing and resizing
   // and whatever else
 
   return 0;
