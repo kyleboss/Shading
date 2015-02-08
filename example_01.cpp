@@ -56,6 +56,11 @@ typedef struct {
     this->val2 = this->val2/length;
     this->val3 = this->val3/length;
   }
+  void scale(float scalar){
+    this->val1 = this->scalar*val1;
+    this->val2 = this->scalar*val2;
+    this->val3 = this->scalar*val3;
+  }
 } Vec;
 
 float dotProduct(Vec vec1, Vec vec2) {
