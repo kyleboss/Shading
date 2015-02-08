@@ -45,58 +45,50 @@ class Viewport {
 Viewport  viewport;
 
 typedef struct {
-  float r;
-  float g;
-  float b;
-  void Set(float R, float G, float B){r=R, g=G, b=B;}
-  float dotProduct(Color color2){return r*color2.r + g*color2.g + b*color2.b;}
-  Color normify() {
-    Color newColor;
-    float norm = sqrt(r*r + g*g + b*b);
-    float newR = r / norm;
-    float newG = g / norm;
-    float newB = b / norm;
-    newColor.Set(newR, newG, newB);
-    return newColor;
-  }
-} Color;
+  float val1;
+  float val2;
+  float val3;
+  void Set(float v1, float v2, float v3){val1=v1, val2=v2, val3=v3;}
+  float length(){return sqrt(pow(val1,2)+pow(val2,2)+pow(val3,2));}
+} Vec;
+
+Vec normalize(Vec vec) {
+  float length = vec.length();
+  float val1 = vec.val1/length;
+  float val2 = vec.val2/length;
+  float val3 = vec.val3/length;
+  Vec normalized;
+  normalized.Set(val1, val2, val3);
+  return normalized;
+}
+
+float dotProduct(Vec vec1, Vec vec2) {
+  return vec1.val1*vec2.val1 + vec1.val2*vec2.val2 + vec1.val3*vec2.val3;
+}
+
+Vec mul(Vec vec1, Vec vec2) {
+  Vec mulVec;
+  float val1 = vec1.val1*vec2.val1;
+  float val2 = vec1.val2*vec2.val2;
+  float val3 = vec1.val3*vec2.val3;
+  mulVec.Set(val1, val2, val3);
+  return mulVec;
+}
 
 typedef struct {
-  float x;
-  float y;
-  float z;
-  void Set(float X, float Y, float Z){x=X, y=Y, z=Z;}
-  float dotProduct(Pos pos2){return x*pos2.x + y*pos2.y + z*pos2.z;}
-  Pos normify() {
-    Pos newPos;
-    float norm = sqrt(x*x + y*y + z*z);
-    float newX = x / norm;
-    float newY = y / norm;
-    float newZ = z / norm;
-    newPos.Set(newX, newY, newZ);
-    return newPos;
-  }
-} Pos;
-
-typedef struct {
-  Color color;
-  Pos pos;
-  void Set(Color setColor, Pos setPos){color=setColor, pos=setPos;}
+  Vec color;
+  Vec pos;
+  void Set(Vec setColor, Vec setPos){color=setColor, pos=setPos;}
 } Light;
 
-Color ka;
-Color kd;
-Color ks;
+Vec ka;
+Vec kd;
+Vec ks;
 int numDl = 0;
 int numPl = 0;
-Light dl[] = {Light dl0, Light dl1, Light dl2, Light dl3, Light dl4};
-Light pl[] = {Light pl0, Light pl1, Light pl2, Light pl3, Light pl4};
-
-int numDl = 0;
-int numPl = 0;
-int totalLights = 0;
-int dl[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3};
-int pl[] = {GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
+Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
+Light dl[] = {dl0, dl1, dl2, dl3, dl4};
+Light pl[] = {pl0, pl1, pl2, pl3, pl4};
 
 //****************************************************
 // Simple init function
@@ -115,7 +107,6 @@ void initScene(int argc, char *argv[]){
       ka.Set(r,g,b);
       GLfloat ambient[] = {r,g,b,1};
       glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-      std::cout << ka.r << std::endl;
       i += 3;
     }
     if(strcmp(argv[i], "-kd") == 0) {
@@ -148,8 +139,8 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
-      Color lightColor;
-      Pos lightPos;
+      Vec lightColor;
+      Vec lightPos;
       lightColor.Set(r,g,b);
       lightPos.Set(x,y,z);
       pl[numPl].Set(lightColor, lightPos);
@@ -164,12 +155,12 @@ void initScene(int argc, char *argv[]){
       float r = strtof(argv[i+4], NULL);
       float g = strtof(argv[i+5], NULL);
       float b = strtof(argv[i+6], NULL);
-      Color lightColor;
-      Pos lightPos;
+      Vec lightColor;
+      Vec lightPos;
       lightColor.Set(r,g,b);
       lightPos.Set(x,y,z);
       dl[numDl].Set(lightColor, lightPos);
-      numdl += 1;
+      numDl += 1;
       i += 6;
     }
   }
