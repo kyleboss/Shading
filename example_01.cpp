@@ -107,6 +107,7 @@ Vec v;
 v.Set(0, 0, 1);
 int numDl = 0;
 int numPl = 0;
+float rv;
 Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
 Light dl[] = {dl0, dl1, dl2, dl3, dl4};
 Light pl[] = {pl0, pl1, pl2, pl3, pl4};
@@ -124,8 +125,8 @@ void initScene(int argc, char *argv[]){
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
       ka.Set(r,g,b);
-      GLfloat ambient[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+      //GLfloat ambient[] = {r,g,b,1};
+      //glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
       i += 3;
     }
     if(strcmp(argv[i], "-kd") == 0) {
@@ -133,8 +134,8 @@ void initScene(int argc, char *argv[]){
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
       kd.Set(r,g,b);
-      GLfloat diffuse[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+      //GLfloat diffuse[] = {r,g,b,1};
+      //glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
       i += 3;
     }
     if(strcmp(argv[i], "-ks") == 0) {
@@ -142,13 +143,13 @@ void initScene(int argc, char *argv[]){
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
       ks.Set(r,g,b);
-      GLfloat specular[] = {r,g,b,1};
-      glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+      //GLfloat specular[] = {r,g,b,1};
+      //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
       i += 3;
     }
     if(strcmp(argv[i], "-sp") == 0) {
-      float rv= strtof(argv[i+1], NULL);
-      glMaterialf(GL_FRONT, GL_SHININESS, rv);
+      rv = strtof(argv[i+1], NULL);
+      //glMaterialf(GL_FRONT, GL_SHININESS, rv);
       i += 1;
     }
     if(strcmp(argv[i], "-pl") == 0) {
@@ -273,18 +274,18 @@ void circle(float centerX, float centerY, float radius) {
 
         for (k=0; k < numDl; k++) { //loop direction light
           //dl[k].color = I
-          Vec ambient; // ambient = ka*I; color
-          ambient.Set(mul(ka, dl[k].color));
+          // ambient = ka*I; color
+          Vec ambient = mul(ka, dl[k].color);
 
-          Vec diffuse; //diffuse = kd * I * max(l.n, 0); color
-          diffuse.Set(mul(kd, dl[k].color).scale(diffPos));
+          //diffuse = kd * I * max(l.n, 0); color
+          Vec diffuse = mul(kd, dl[k].color).scale(diffPos);
 
-          Vec specular; //diffuse = ks * I * max(r.v, 0); color
-          specular.Set(mul(ks, dl[k].color).scale(specPos));
+          //diffuse = ks * I * max(r.v, 0); color
+          Vec specular = mul(ks, dl[k].color).scale(specPos);
 
         }
 
-
+        Vec total = add(ambient, diffuse, specular);
 
         setPixel(i, j, total.val1, total.val2, total.val3);
 
