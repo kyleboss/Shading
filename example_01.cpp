@@ -57,9 +57,9 @@ typedef struct {
     this->val3 = this->val3/length;
   }
   void scale(float scalar){
-    this->val1 = this->scalar*val1;
-    this->val2 = this->scalar*val2;
-    this->val3 = this->scalar*val3;
+    this->val1 = scalar*val1;
+    this->val2 = scalar*val2;
+    this->val3 = scalar*val3;
   }
 } Vec;
 
@@ -104,7 +104,6 @@ Vec ka;
 Vec kd;
 Vec ks;
 Vec v;
-v.Set(0, 0, 1);
 int numDl = 0;
 int numPl = 0;
 float rv;
@@ -260,32 +259,33 @@ void circle(float centerX, float centerY, float radius) {
         norm.Set(i, j, z);
         norm.normalize();
 
-        float ln = dotProduct(dl[k].pos.normalize(), norm);
-        
-        float diffPos = max(0, ln); //max(l.n, 0)
-        
-        Vec r;
-        r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
-        r.Scale(2 * ln)
-        r = sub(r, dl[k].pos.normalize()); //r is correct
-        r.normalize();
+        for (int k=0; k < numDl; k++) { //loop direction light
+          Vec normLight = dl[k].pos;
+          normLight.normalize();
+          float ln = dotProduct(normLight, norm);
+          
+          float diffPos = max(0.0f, ln); //max(l.n, 0)
+          
+          Vec r;
+          r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
+          r.scale(2 * ln);
+          r = sub(r, normLight); //r is correct
+          r.normalize();
 
-        float specPos = pow(max(0, dotProduct(r, v)), rv);
-
-        for (k=0; k < numDl; k++) { //loop direction light
+          float specPos = pow(max(0.0f, dotProduct(r, v)), rv);
           //dl[k].color = I
           // ambient = ka*I; color
           Vec ambient = mul(ka, dl[k].color);
 
           //diffuse = kd * I * max(l.n, 0); color
-          Vec diffuse = mul(kd, dl[k].color).scale(diffPos);
+          Vec diffuse = mul(kd, dl[k].color);
+          diffuse.scale(diffPos);
 
           //diffuse = ks * I * max(r.v, 0); color
-          Vec specular = mul(ks, dl[k].color).scale(specPos);
-
+          Vec specular = mul(ks, dl[k].color);
+          specular.scale(specPos);
+          total = add(ambient, diffuse, specular);
         }
-
-        Vec total = add(ambient, diffuse, specular);
 
         setPixel(i, j, total.val1, total.val2, total.val3);
 
@@ -346,7 +346,7 @@ int main(int argc, char *argv[]) {
   glutInitWindowSize(viewport.w, viewport.h);
   glutInitWindowPosition(0,0);
   glutCreateWindow(argv[0]);
-
+  v.Set(0, 0, 1);
   initScene(argc, argv);              // quick function to set up scene
   glutDisplayFunc(myDisplay);       // function to run when its time to draw something
   glutReshapeFunc(myReshape);       // function to run when the window gets resized
