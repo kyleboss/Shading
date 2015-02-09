@@ -115,10 +115,7 @@ Light pl[] = {pl0, pl1, pl2, pl3, pl4};
 // Simple init function
 //****************************************************
 void initScene(int argc, char *argv[]){
-  GLint iLights;
-  glGetIntegerv(GL_MAX_LIGHTS, &iLights);
   for (int i = 1; i < argc; ++i) {
-    std::cout << argv[i] << std::endl;
     if(strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
@@ -167,7 +164,6 @@ void initScene(int argc, char *argv[]){
       i += 6;
     }
     if(strcmp(argv[i], "-dl") == 0) {
-      std::cout << typeid(GL_LIGHT0).name() << '\n';
       float x = strtof(argv[i+1], NULL);
       float y = strtof(argv[i+2], NULL);
       float z = strtof(argv[i+3], NULL);
@@ -254,7 +250,7 @@ void circle(float centerX, float centerY, float radius) {
         float z = sqrt(radius*radius-dist*dist);
         
         Vec total; //treat as color
-
+        total.Set(0,0,0);
         Vec norm; //normal: position vector
         norm.Set(i, j, z);
         norm.normalize();
@@ -286,7 +282,6 @@ void circle(float centerX, float centerY, float radius) {
           specular.scale(specPos);
           total = add(ambient, diffuse, specular);
         }
-
         setPixel(i, j, total.val1, total.val2, total.val3);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
