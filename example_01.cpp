@@ -203,9 +203,10 @@ void myReshape(int w, int h) {
 // this example.
 //****************************************************
 
-void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
+void setPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b) {
   glColor3f(r, g, b);
   glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
+  glNormal3f(0,0,z);
   // centers 
   // Note: Need to check for gap
   // bug on inst machines.
@@ -257,6 +258,7 @@ void circle(float centerX, float centerY, float radius) {
 
         for (int k=0; k < numDl; k++) { //loop direction light
           Vec normLight = dl[k].pos;
+          //normLight = sub(norm,normLight);
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
           
@@ -282,7 +284,7 @@ void circle(float centerX, float centerY, float radius) {
           specular.scale(specPos);
           total = add(ambient, diffuse, specular);
         }
-        setPixel(i, j, total.val1, total.val2, total.val3);
+        setPixel(i, j, z, total.val1, total.val2, total.val3);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
         // setPixel(i,j, x/radius, y/radius, z/radius );
