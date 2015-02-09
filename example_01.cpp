@@ -106,7 +106,7 @@ Vec ks;
 Vec v;
 int numDl = 0;
 int numPl = 0;
-float rv;
+float rv = 1;
 Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
 Light dl[] = {dl0, dl1, dl2, dl3, dl4};
 Light pl[] = {pl0, pl1, pl2, pl3, pl4};
@@ -289,8 +289,9 @@ void circle(float centerX, float centerY, float radius) {
           total.val3 += subTotal.val3;
         }
 
-        for (int k=0; k < numPl; k++) { //loop direction light
+        for (int k=0; k < numPl; k++) { //loop POSITION light
           Vec normLight = pl[k].pos;
+          normLight = sub(normLight, norm);
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
           
