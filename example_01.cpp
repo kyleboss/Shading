@@ -282,7 +282,43 @@ void circle(float centerX, float centerY, float radius) {
           //diffuse = ks * I * max(r.v, 0); color
           Vec specular = mul(ks, dl[k].color);
           specular.scale(specPos);
-          total = add(ambient, diffuse, specular);
+
+          Vec subTotal = add(ambient, diffuse, specular);
+          total.val1 += subTotal.val1;
+          total.val2 += subTotal.val2;
+          total.val3 += subTotal.val3;
+        }
+
+        for (int k=0; k < numPl; k++) { //loop direction light
+          Vec normLight = pl[k].pos;
+          normLight.normalize();
+          float ln = dotProduct(normLight, norm);
+          
+          float diffPos = max(0.0f, ln); //max(l.n, 0)
+          
+          Vec r;
+          r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
+          r.scale(2 * ln);
+          r = sub(r, normLight); //r is correct
+          r.normalize();
+
+          float specPos = pow(max(0.0f, dotProduct(r, v)), rv);
+          //dl[k].color = I
+          // ambient = ka*I; color
+          Vec ambient = mul(ka, pl[k].color);
+
+          //diffuse = kd * I * max(l.n, 0); color
+          Vec diffuse = mul(kd, pl[k].color);
+          diffuse.scale(diffPos);
+
+          //diffuse = ks * I * max(r.v, 0); color
+          Vec specular = mul(ks, pl[k].color);
+          specular.scale(specPos);
+
+          Vec subTotal = add(ambient, diffuse, specular);
+          total.val1 += subTotal.val1;
+          total.val2 += subTotal.val2;
+          total.val3 += subTotal.val3;
         }
         setPixel(i, j, z, total.val1, total.val2, total.val3);
 
