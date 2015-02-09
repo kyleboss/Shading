@@ -115,6 +115,11 @@ Light pl[] = {pl0, pl1, pl2, pl3, pl4};
 // Simple init function
 //****************************************************
 void initScene(int argc, char *argv[]){
+  ka.Set(0,0,0);
+  kd.Set(0,0,0);
+  ks.Set(0,0,0);
+  v.Set(0, 0, 1);
+
   for (int i = 1; i < argc; ++i) {
     if(strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
@@ -259,12 +264,13 @@ void circle(float centerX, float centerY, float radius) {
         for (int k=0; k < numDl; k++) { //loop direction light
           Vec normLight = dl[k].pos;
           //normLight = sub(norm,normLight);
+          normLight.scale(radius);
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
           
           float diffPos = max(0.0f, ln); //max(l.n, 0)
           
-          Vec r;
+          Vec r; // r = -l + 2(l.n)n
           r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
           r.scale(2 * ln);
           r = sub(r, normLight); //r is correct
@@ -279,7 +285,7 @@ void circle(float centerX, float centerY, float radius) {
           Vec diffuse = mul(kd, dl[k].color);
           diffuse.scale(diffPos);
 
-          //diffuse = ks * I * max(r.v, 0); color
+          //specular = ks * I * max(r.v, 0); color
           Vec specular = mul(ks, dl[k].color);
           specular.scale(specPos);
 
@@ -291,6 +297,7 @@ void circle(float centerX, float centerY, float radius) {
 
         for (int k=0; k < numPl; k++) { //loop POSITION light
           Vec normLight = pl[k].pos;
+          normLight.scale(radius);
           normLight = sub(normLight, norm);
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
@@ -380,7 +387,6 @@ int main(int argc, char *argv[]) {
   glutInitWindowSize(viewport.w, viewport.h);
   glutInitWindowPosition(0,0);
   glutCreateWindow(argv[0]);
-  v.Set(0, 0, 1);
   initScene(argc, argv);              // quick function to set up scene
   glutDisplayFunc(myDisplay);       // function to run when its time to draw something
   glutReshapeFunc(myReshape);       // function to run when the window gets resized
