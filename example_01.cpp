@@ -307,7 +307,7 @@ void myDisplay() {
 
   // Start drawing
 
-  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) / 3.0);
+  circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) * 0.45);
 
   glFlush();
   glutSwapBuffers();          // swap buffers (we earlier set double buffer)
