@@ -113,6 +113,15 @@ int numDl = 0;
 int numPl = 0;
 float rv = 1;
 int toon = 0;
+int saveImg = 0;
+char fileName[] = "as1.bmp";
+int width = 400;
+int height = 400;
+FILE *filePtr;
+unsigned char *image = NULL;
+unsigned char bmppad[3] = {0,0,0};
+int filesize = 54 + 3*width*height;  //w is your image width, h is image height, both int
+
 Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
 Light dl[] = {dl0, dl1, dl2, dl3, dl4};
 Light pl[] = {pl0, pl1, pl2, pl3, pl4};
@@ -122,7 +131,7 @@ Light pl[] = {pl0, pl1, pl2, pl3, pl4};
 //****************************************************
 void initScene(int argc, char *argv[]){
   for (int i = 1; i < argc; ++i) {
-    if(strcmp(argv[i], "-ka") == 0) {
+    if(i < argc && strcmp(argv[i], "-ka") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
@@ -131,7 +140,7 @@ void initScene(int argc, char *argv[]){
       //glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
       i += 3;
     }
-    if(strcmp(argv[i], "-kd") == 0) {
+    if(i < argc && strcmp(argv[i], "-kd") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
@@ -140,7 +149,7 @@ void initScene(int argc, char *argv[]){
       //glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
       i += 3;
     }
-    if(strcmp(argv[i], "-ks") == 0) {
+    if(i < argc && strcmp(argv[i], "-ks") == 0) {
       float r = strtof(argv[i+1], NULL);
       float g = strtof(argv[i+2], NULL);
       float b = strtof(argv[i+3], NULL);
@@ -149,12 +158,12 @@ void initScene(int argc, char *argv[]){
       //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
       i += 3;
     }
-    if(strcmp(argv[i], "-sp") == 0) {
+    if(i < argc && strcmp(argv[i], "-sp") == 0) {
       rv = strtof(argv[i+1], NULL);
       //glMaterialf(GL_FRONT, GL_SHININESS, rv);
       i += 1;
     }
-    if(strcmp(argv[i], "-pl") == 0) {
+    if(i < argc && strcmp(argv[i], "-pl") == 0) {
       float x = strtof(argv[i+1], NULL);
       float y = strtof(argv[i+2], NULL);
       float z = strtof(argv[i+3], NULL);
@@ -169,7 +178,7 @@ void initScene(int argc, char *argv[]){
       numPl += 1;
       i += 6;
     }
-    if(strcmp(argv[i], "-dl") == 0) {
+    if(i < argc && strcmp(argv[i], "-dl") == 0) {
       float x = strtof(argv[i+1], NULL);
       float y = strtof(argv[i+2], NULL);
       float z = strtof(argv[i+3], NULL);
@@ -184,8 +193,44 @@ void initScene(int argc, char *argv[]){
       numDl += 1;
       i += 6;
     }
-    if(strcmp(argv[i], "-t") == 0) {
+    if(i < argc && strcmp(argv[i], "-t") == 0) {
       toon = 1;
+      i+=1;
+    }
+    if(i < argc && strcmp(argv[i], "-s") == 0) {
+      saveImg = 1;
+      image = new unsigned char[3*width*height*sizeof(char)];
+      glPixelStorei(GL_PACK_ALIGNMENT,1);
+
+      if( image ) {
+        free( image );
+      }
+      image = (unsigned char *)malloc(3*width*height);
+      memset(image,0,sizeof(image));
+      unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+      unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
+      unsigned char bmppad[3] = {0,0,0};
+      bmpfileheader[ 2] = (unsigned char)(filesize    );
+      bmpfileheader[ 3] = (unsigned char)(filesize>> 8);
+      bmpfileheader[ 4] = (unsigned char)(filesize>>16);
+      bmpfileheader[ 5] = (unsigned char)(filesize>>24);
+
+      bmpinfoheader[ 4] = (unsigned char)(       width    );
+      bmpinfoheader[ 5] = (unsigned char)(       width>> 8);
+      bmpinfoheader[ 6] = (unsigned char)(       width>>16);
+      bmpinfoheader[ 7] = (unsigned char)(       width>>24);
+      bmpinfoheader[ 8] = (unsigned char)(       height    );
+      bmpinfoheader[ 9] = (unsigned char)(       height>> 8);
+      bmpinfoheader[10] = (unsigned char)(       height>>16);
+      bmpinfoheader[11] = (unsigned char)(       height>>24);
+      filePtr = fopen("img.bmp","wb");
+      fwrite(bmpfileheader,1,14,filePtr);
+      fwrite(bmpinfoheader,1,40,filePtr);
+      glReadBuffer(GL_BACK_LEFT);
+      glReadPixels(0,0,width,height,GL_RGB,GL_UNSIGNED_BYTE,image);
+      // fwrite(&bmpfileheader, sizeof(bmpfileheader), 1, filePtr);
+      // fwrite(&bmpinfoheader, sizeof(bmpinfoheader), 1, filePtr);
+      // fwrite(image, 400*400*3, 1, filePtr);
       i+=1;
     }
   }
@@ -398,7 +443,24 @@ void myDisplay() {
   // Start drawing
 
   circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) * 0.45);
-
+  if (saveImg) {
+    glReadBuffer(GL_BACK_RIGHT);
+    glReadPixels(0,0,width,height,GL_RGB,GL_UNSIGNED_BYTE,image);
+    for (int j=0; j<height; j++) {
+      for (int i=0;i<width; i++) {
+        fputc(image[3*j*width+3*i+0],filePtr);
+        fputc(image[3*j*width+3*i+1],filePtr);
+        fputc(image[3*j*width+3*i+2],filePtr);
+      }
+    }
+    // for(int i=0; i<height; i++)
+    // {
+    //     fwrite(image+(width*(height-i-1)*3),3,width,filePtr);
+    //     fwrite(bmppad,1,(4-(width*3)%4)%4,filePtr);
+    // }
+    fclose(filePtr);
+    delete [] image;
+  }
   glFlush();
   glutSwapBuffers();          // swap buffers (we earlier set double buffer)
 }
