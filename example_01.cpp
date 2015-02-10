@@ -112,6 +112,7 @@ Vec v;
 int numDl = 0;
 int numPl = 0;
 float rv = 1;
+int toon = 0;
 Light dl0, dl1, dl2, dl3, dl4, pl0, pl1, pl2, pl3, pl4;
 Light dl[] = {dl0, dl1, dl2, dl3, dl4};
 Light pl[] = {pl0, pl1, pl2, pl3, pl4};
@@ -182,6 +183,10 @@ void initScene(int argc, char *argv[]){
       dl[numDl].Set(lightColor, lightPos);
       numDl += 1;
       i += 6;
+    }
+    if(strcmp(argv[i], "-t") == 0) {
+      toon = 1;
+      i+=1;
     }
   }
 }
@@ -327,6 +332,46 @@ void circle(float centerX, float centerY, float radius) {
           total.val2 += subTotal.val2;
           total.val3 += subTotal.val3;
         }
+
+        if (toon) { //WOW COOL IF STATEMENTS YEAH
+          if (total.val1 < 0.35) {
+            total.val1 = 0.2;
+          }
+          if (total.val2 < 0.35) {
+            total.val2 = 0.2;
+          }
+          if (total.val3 < 0.35) {
+            total.val3 = 0.2;
+          }          /*
+          if (total.val1 < 0.392 && total.val1 >= 0.15) {
+            total.val1 = 0.196;
+          }
+          if (total.val2 < 0.392 && total.val2 >= 0.15) {
+            total.val2 = 0.196;
+          }
+          if (total.val3 < 0.392 && total.val3 >= 0.15) {
+            total.val3 = 0.196;
+          }          */
+          if (total.val1 < 0.784 && total.val1 >= 0.35) {
+            total.val1 = 0.684;
+          }
+          if (total.val2 < 0.784 && total.val2 >= 0.35) {
+            total.val2 = 0.684;
+          }
+          if (total.val3 < 0.784 && total.val3 >= 0.35) {
+            total.val3 = 0.684;
+          }  
+          if (total.val1 >= 0.784) {
+            total.val1 = 0.94;
+          }
+          if (total.val2 >= 0.784) {
+            total.val2 = 0.94;
+          }
+          if (total.val3 >= 0.784) {
+            total.val3 = 0.94;
+          }  
+        }
+
         setPixel(i, j, z, total.val1, total.val2, total.val3);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
