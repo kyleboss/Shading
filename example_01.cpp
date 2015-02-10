@@ -61,6 +61,10 @@ typedef struct {
     this->val2 = scalar*val2;
     this->val3 = scalar*val3;
   }
+  void scale2(float scalar) {
+    this->val1 = scalar*val1;
+    this->val2 = scalar*val2;
+  }
 } Vec;
 
 float dotProduct(Vec vec1, Vec vec2) {
@@ -164,6 +168,7 @@ void initScene(int argc, char *argv[]){
       Vec lightPos;
       lightColor.Set(r,g,b);
       lightPos.Set(x,y,z);
+      lightPos.normalize();
       pl[numPl].Set(lightColor, lightPos);
       numPl += 1;
       i += 6;
@@ -179,6 +184,7 @@ void initScene(int argc, char *argv[]){
       Vec lightPos;
       lightColor.Set(r,g,b);
       lightPos.Set(x,y,z);
+      lightPos.normalize();
       dl[numDl].Set(lightColor, lightPos);
       numDl += 1;
       i += 6;
@@ -211,7 +217,7 @@ void myReshape(int w, int h) {
 void setPixel(int x, int y, int z, GLfloat r, GLfloat g, GLfloat b) {
   glColor3f(r, g, b);
   glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
-  glNormal3f(0,0,z);
+  glNormal3f(x,y,z);
   // centers 
   // Note: Need to check for gap
   // bug on inst machines.
@@ -258,13 +264,12 @@ void circle(float centerX, float centerY, float radius) {
         Vec total; //treat as color
         total.Set(0,0,0);
         Vec norm; //normal: position vector
-        norm.Set(i, j, z);
+        norm.Set(x, y, z);
         norm.normalize();
 
         for (int k=0; k < numDl; k++) { //loop direction light
           Vec normLight = dl[k].pos;
-          //normLight = sub(norm,normLight);
-          normLight.scale(radius);
+          normLight.scale2(-1);
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
           
@@ -295,32 +300,32 @@ void circle(float centerX, float centerY, float radius) {
           total.val3 += subTotal.val3;
         }
 
-        for (int k=0; k < numPl; k++) { //loop POSITION light
-          Vec normLight = pl[k].pos;
-          normLight.scale(radius);
-          normLight = sub(normLight, norm);
-          normLight.normalize();
-          float ln = dotProduct(normLight, norm);
+        for (int fuck=0; fuck < numPl; fuck++) { //loop POSITION light
+          Vec posNormLight = pl[fuck].pos;
+          posNormLight = sub(norm, posNormLight);
+          posNormLight.scale2(-1);
+          posNormLight.normalize();
+          float ln = dotProduct(posNormLight, norm);
           
           float diffPos = max(0.0f, ln); //max(l.n, 0)
           
-          Vec r;
+          Vec r; // r = -l + 2(l.n)n
           r.Set(norm.val1, norm.val2, norm.val3); //currently r = n
           r.scale(2 * ln);
-          r = sub(r, normLight); //r is correct
+          r = sub(r, posNormLight); //r is correct
           r.normalize();
-
+          v.normalize();
           float specPos = pow(max(0.0f, dotProduct(r, v)), rv);
           //dl[k].color = I
           // ambient = ka*I; color
-          Vec ambient = mul(ka, pl[k].color);
+          Vec ambient = mul(ka, pl[fuck].color);
 
           //diffuse = kd * I * max(l.n, 0); color
-          Vec diffuse = mul(kd, pl[k].color);
+          Vec diffuse = mul(kd, pl[fuck].color);
           diffuse.scale(diffPos);
 
           //diffuse = ks * I * max(r.v, 0); color
-          Vec specular = mul(ks, pl[k].color);
+          Vec specular = mul(ks, pl[fuck].color);
           specular.scale(specPos);
 
           Vec subTotal = add(ambient, diffuse, specular);
