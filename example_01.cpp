@@ -64,6 +64,7 @@ typedef struct {
   void flip(){
     this->val1 = -val1;
     this->val2 = -val2;
+    this->val3 = -val3;
   }
 } Vec;
 
