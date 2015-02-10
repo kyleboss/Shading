@@ -61,6 +61,10 @@ typedef struct {
     this->val2 = scalar*val2;
     this->val3 = scalar*val3;
   }
+  void flip(){
+    this->val1 = -val1;
+    this->val2 = -val2;
+  }
 } Vec;
 
 float dotProduct(Vec vec1, Vec vec2) {
@@ -259,6 +263,7 @@ void circle(float centerX, float centerY, float radius) {
         for (int k=0; k < numDl; k++) { //loop direction light
           Vec normLight = dl[k].pos;
           //normLight = sub(norm,normLight);
+          normLight.flip();
           normLight.normalize();
           float ln = dotProduct(normLight, norm);
           
