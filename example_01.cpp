@@ -200,7 +200,8 @@ void initScene(int argc, char *argv[]){
     if(i < argc && strcmp(argv[i], "-s") == 0) {
       saveImg = 1;
       image = new unsigned char[3*width*height*sizeof(char)];
-      glPixelStorei(GL_PACK_ALIGNMENT,1);
+      glPixelStorei(GL_PACK_SWAP_BYTES,1);
+      // glPixelStorei(GL_PACK_ALIGNMENT,1);
 
       if( image ) {
         free( image );
@@ -226,11 +227,6 @@ void initScene(int argc, char *argv[]){
       filePtr = fopen("img.bmp","wb");
       fwrite(bmpfileheader,1,14,filePtr);
       fwrite(bmpinfoheader,1,40,filePtr);
-      glReadBuffer(GL_BACK_LEFT);
-      glReadPixels(0,0,width,height,GL_RGB,GL_UNSIGNED_BYTE,image);
-      // fwrite(&bmpfileheader, sizeof(bmpfileheader), 1, filePtr);
-      // fwrite(&bmpinfoheader, sizeof(bmpinfoheader), 1, filePtr);
-      // fwrite(image, 400*400*3, 1, filePtr);
       i+=1;
     }
   }
@@ -445,7 +441,7 @@ void myDisplay() {
   circle(viewport.w / 2.0 , viewport.h / 2.0 , min(viewport.w, viewport.h) * 0.45);
   if (saveImg) {
     glReadBuffer(GL_BACK_RIGHT);
-    glReadPixels(0,0,width,height,GL_RGB,GL_UNSIGNED_BYTE,image);
+    glReadPixels(0,0,width,height,GL_BGR,GL_UNSIGNED_BYTE,image);
     for (int j=0; j<height; j++) {
       for (int i=0;i<width; i++) {
         fputc(image[3*j*width+3*i+0],filePtr);
@@ -453,11 +449,6 @@ void myDisplay() {
         fputc(image[3*j*width+3*i+2],filePtr);
       }
     }
-    // for(int i=0; i<height; i++)
-    // {
-    //     fwrite(image+(width*(height-i-1)*3),3,width,filePtr);
-    //     fwrite(bmppad,1,(4-(width*3)%4)%4,filePtr);
-    // }
     fclose(filePtr);
     delete [] image;
   }
