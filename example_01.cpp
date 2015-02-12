@@ -201,7 +201,6 @@ void initScene(int argc, char *argv[]){
       saveImg = 1;
       image = new unsigned char[3*width*height*sizeof(char)];
       glPixelStorei(GL_PACK_SWAP_BYTES,1);
-      // glPixelStorei(GL_PACK_ALIGNMENT,1);
 
       if( image ) {
         free( image );
