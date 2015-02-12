@@ -374,7 +374,7 @@ void circle(float centerX, float centerY, float radius) {
           total.val3 += subTotal.val3;
         }
 
-        if (toon) { //WOW COOL IF STATEMENTS YEAH
+       if (toon) { //WOW COOL IF STATEMENTS YEAH
           if (total.val1 < 0.35) {
             total.val1 = 0.2;
           }
@@ -412,7 +412,7 @@ void circle(float centerX, float centerY, float radius) {
             total.val3 = 0.94;
           }  
         }
-
+        
         setPixel(i, j, z, total.val1, total.val2, total.val3);
 
         // This is amusing, but it assumes negative color values are treated reasonably.
