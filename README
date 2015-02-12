@@ -1,0 +1,8 @@
+Partner 1: Kyle Boss
+Partner 2: Jingyi Li
+Code runs on OS X
+cs184-ck will have the code. 
+
+EXTRA CREDIT FEATURES: 
+Saves image to current directory as img.bmp with -s tag
+Draws toon shading with -t tag.
